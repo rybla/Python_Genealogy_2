@@ -1,0 +1,15 @@
+For now, trait will be either 0 or 1
+
+factors:
+    - a: age factor
+    - b: preferencial attachement factor
+    - c: trait factor
+
+def fitness(gen_number, children_number, trait):
+
+    trait_strength = how much more dominant one trait is over another
+
+    age = current_gen_number - gen_number
+
+    fitness = (age)^(-a) * (children_number+1)^(b) * trait_strength^(c)
+
