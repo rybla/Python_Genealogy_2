@@ -54,10 +54,11 @@ def make_genealogy(
             popular_factor=-1,
             trait_factor=-1,
             balanced=False, # set to True if you want the first generation to be evenly colored (only works with 2 colors in traits)
-            dot=True
+            dot=True,
+            trait_weights=None
         ):
 
-    global NAME, GENERATIONS, PARENTS, GENERATION_SIZES_FUNCTION, BALANCED, AGE_FACTOR, POPULAR_FACTOR, TRAIT_FACTOR
+    global NAME, GENERATIONS, PARENTS, GENERATION_SIZES_FUNCTION, BALANCED, AGE_FACTOR, POPULAR_FACTOR, TRAIT_FACTOR, TRAITS
 
     GENERATIONS = generations
     PARENTS = parents
@@ -78,6 +79,10 @@ def make_genealogy(
     if trait_factor != -1:
 
         TRAIT_FACTOR = trait_factor
+
+    if trait_weights != None:
+
+        TRAITS = trait_weights
 
     # set the name of genealogy (and file)
 
