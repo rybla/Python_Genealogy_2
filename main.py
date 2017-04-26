@@ -1,9 +1,10 @@
 import genealogy
 import dot_creator
-import genealogy_inspector
+import genealogy_inspector as gi
+import testing
 import numpy as np
-import sys
-import time
-import file_manager
-import matplotlib.pyplot as plt
 from tqdm import tqdm
+
+testing.test_ratios_rising(1,np.arange(2,5,1),2)
+
+quit()

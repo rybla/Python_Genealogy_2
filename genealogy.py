@@ -4,7 +4,7 @@ import math
 random.seed()
 
 def init_genealogy():
-    global AGE_FACTOR, POPULAR_FACTOR, TRAIT_FACTOR, TRAITS, NAME, GENERATIONS, PARENTS, GENERATION_COUNTS, MEMBERS, BALANCED
+    global AGE_FACTOR, POPULAR_FACTOR, TRAIT_FACTOR, TRAITS, NAME, GENERATIONS, PARENTS, GENERATION_COUNTS, MEMBERS, BALANCED, INITIAL_COUNTS
 
     AGE_FACTOR = 0
 
@@ -28,6 +28,8 @@ def init_genealogy():
     MEMBERS = []
 
     BALANCED = False
+
+    INITIAL_COUNTS = None
 
     """
 
@@ -54,17 +56,20 @@ def make_genealogy(
             popular_factor=-1,
             trait_factor=-1,
             balanced=False, # set to True if you want the first generation to be evenly colored (only works with 2 colors in traits)
+            initial_counts=None,
             dot=True,
             trait_weights=None
         ):
 
-    global NAME, GENERATIONS, PARENTS, GENERATION_SIZES_FUNCTION, BALANCED, AGE_FACTOR, POPULAR_FACTOR, TRAIT_FACTOR, TRAITS
+    global NAME, GENERATIONS, PARENTS, GENERATION_SIZES_FUNCTION, BALANCED, AGE_FACTOR, POPULAR_FACTOR, TRAIT_FACTOR, TRAITS, INITIAL_COUNTS
 
     GENERATIONS = generations
     PARENTS = parents
     GENERATION_SIZES_FUNCTION = generation_sizes_function
 
     BALANCED = balanced
+
+    INITIAL_COUNTS = initial_counts
 
     # set all the factors if they were given as inputs
 
@@ -360,16 +365,25 @@ def update_fitness_raw(mem_ind):
 def create_random_member(i):
     global CURRENT_MEMBER
 
+    # make half of the first generation each of the two possible traits
+    # (only works with two traits!)
     if BALANCED:
 
         half = int(get_gen_size(0)/2)
 
         if i < half:
-
             trait_value = 0
 
         else:
+            trait_value = 1
 
+    # for len(INITIAL_COUNTS) trait values, decide how many have each value
+    elif INITIAL_COUNTS != None:
+
+        if i < INITIAL_COUNTS[0]:
+            trait_value = 0
+
+        elif i <= INITIAL_COUNTS[1]:
             trait_value = 1
 
     else:

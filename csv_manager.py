@@ -1,6 +1,10 @@
 import csv
 
-with open('names.csv', 'w') as csvfile:
+def create_csv(labels,data_array):
+    
+
+
+with open('names.csv', 'w+') as csvfile:
     fieldnames = ['Id','Label', 'Source', 'Target']
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 

@@ -1,0 +1,15 @@
+Speed of taveover of dominant trait: D and S values.
+    How to measure this speed:
+    - How fast to get to 50% (A'|50%) from a percentage (lets say there will be one trait A)
+    - Look at max of first derivative
+
+- Speed versus Fitess
+- Chance of getting chosen as a parent
+- Add option for theri to be x genes with each having y different values
+    - When calculating fitness from traits:
+        - Additive
+        - Multiplicative (nonlinear)
+
+Goals:
+- Make graphs using new measurements for trait values vs time
+- For matrix diagram, make the centering be more interesting
