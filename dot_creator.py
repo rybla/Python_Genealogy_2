@@ -9,13 +9,15 @@ genealogy_data = None
 dot_file = None
 generations_labels = []
 
-def create_dot(gen_data):
+def create_dot(gen_data,pdf=False):
     global genealogy_data, dot_file
 
     genealogy_data = gen_data
 
+    directory = "outputs/dot/"
+
     # first couple of lines
-    dot_file = file_manager.FileManager("outputs",get_genealogy_name()+".dot")
+    dot_file = file_manager.FileManager(directory,get_genealogy_name()+".dot")
     dot_file.write("graph \"" + get_genealogy_name() + "\"{")
 
     # create the dot stuff
@@ -27,8 +29,9 @@ def create_dot(gen_data):
 
     finish()
 
-    os.system("sudo dot outputs/" + get_genealogy_name() + ".dot -Tpdf -o outputs/" + get_genealogy_name() + ".pdf")
-    os.system("sudo rm outputs/" + get_genealogy_name() + ".dot")
+    if pdf:
+        os.system("sudo dot " + directory + get_genealogy_name() + ".dot -Tpdf -o " + directory + get_genealogy_name() + ".pdf")
+        os.system("sudo rm " + directory + get_genealogy_name() + ".dot")
 
 
 
@@ -158,7 +161,7 @@ def create_relations():
                 edge_color = calculate_edge_color(m,child)
                 pen_width = calculate_edge_width(m,child)
                 s += " ["
-                s += "color=" + str(edge_color)
+                s += "color=\"" + str(edge_color) + "\""
                 s += " penwidth=" + str(pen_width)
                 s += "];"
 
@@ -185,7 +188,7 @@ def create_member_attributes():
             fitness = calculate_member_fitness(m)
             
             s = "    " + index_to_name(gen_ind,i) + " ["
-            s += "color=" + str(color)
+            s += "color=\"" + str(color) + "\""
             s += " shape=" + str(shape)
             s += " width=" + str(width)
             s += " fontsize=" + str(fontsize)

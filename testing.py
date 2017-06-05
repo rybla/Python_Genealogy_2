@@ -9,7 +9,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 
-generations = 80
+generations = 20
 generations_sizes = 20
 
 def test_ratio(parents,ratio,tests):
@@ -58,7 +58,6 @@ def test_ratios_rising(parents, ratio_range, tests):
     gi.legend()
 
     gi.savefig('outputs/ratios/trait_takeover_rising(parents=' + str(parents) + ').png')
-
 
 def test_parents_and_ratios():
     xs = [x for x in np.arange(1,10,2)]

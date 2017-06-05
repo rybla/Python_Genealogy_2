@@ -1,10 +1,11 @@
 import random
 import numpy as np
 import math
+import copy
 random.seed()
 
 def init_genealogy():
-    global AGE_FACTOR, POPULAR_FACTOR, TRAIT_FACTOR, TRAITS, NAME, GENERATIONS, PARENTS, GENERATION_COUNTS, MEMBERS, BALANCED, INITIAL_COUNTS
+    global AGE_FACTOR, POPULAR_FACTOR, TRAIT_FACTOR, TRAITS, NAME, GENERATIONS, PARENTS, GENERATION_COUNTS, MEMBERS, BALANCED, INITIAL_COUNTS, TRAITS_FUNCTION, FITNESS_FUNCTION
 
     AGE_FACTOR = 0
 
@@ -33,11 +34,15 @@ def init_genealogy():
 
     INITIAL_COUNTS = None
 
+    TRAITS_FUNCTION = lambda traits: sum(traits)
+
+    FITNESS_FUNCTION = lambda traits: sum(traits)
+
     """
 
     Structure of a single member (an element of MEMBERS):
     - [0]: [number of children, [array of children indecies]]
-    - [1]: trait value
+    - [1]: trait values (array of trues and falses, for each trait)
     - [2]: fitness (not including age affect)
 
     """
@@ -162,28 +167,38 @@ def get_member_raw(mem_ind):
     return MEMBERS[mem_ind]
 
 
-def set_member_trait(gen_num,mem_num,trait_value):
+def add_member_trait(gen_num,mem_num,trait_index):
 
-    get_member(gen_num,mem_num)[1] = trait_value
+    traits = get_member(gen_num,mem_num)[1][trait_index] = True
+
+
+def remove_member_trait(gen_num,mem_num,trait_index):
+
+    traits = get_member(gen_num,mem_num)[1][trait_index] = False
+
+
+def set_member_traits(gen_num,mem_num,trait_values):
+
+    get_member(gen_num,mem_num)[1] = trait_values
 
     update_fitness(gen_num,mem_num)
 
 
 
-def get_member_trait(gen_num,mem_num):
+def get_member_traits(gen_num,mem_num):
 
     return get_member(gen_num,mem_num)[1]
 
 
 
-def get_member_raw_trait(mem_ind):
+def get_member_raw_traits(mem_ind):
 
     return get_member_raw(mem_ind)[1]
 
 
 def get_memeber_trait_strength(gen_num,mem_num):
 
-    return TRAITS[get_member_trait(gen_num,mem_num)]
+    return TRAITS_FUNCTION(get_member_traits(gen_num,mem_num))
 
 
 def get_member_raw_trait_strength(mem_ind):
@@ -335,7 +350,6 @@ def fill_generation(gen_num):
 def get_active_members():
 
     if CURRENT_GENERATION == 0:
-
         return 0
 
     active = sum(GENERATION_COUNTS[:CURRENT_GENERATION])
@@ -350,7 +364,10 @@ def update_fitness(gen_num,mem_num):
 
     children_number = get_member_children_count(gen_num,mem_num)
 
-    fitness = float((children_number+1)**(POPULAR_FACTOR)) * float(trait_strength**(TRAIT_FACTOR))
+    fitness = FITNESS_FUNCTION([
+        ((children_number+1)**POPULAR_FACTOR),
+        (trait_strength**TRAIT_FACTOR)
+    ])
 
     get_member(gen_num,mem_num)[2] = fitness
 
@@ -373,25 +390,26 @@ def create_random_member(i):
         half = int(get_gen_size(0)/2)
 
         if i < half:
-            trait_value = 0
+            trait_values = [True,False]
 
         else:
-            trait_value = 1
+            trait_values = [False,True]
 
     # for len(INITIAL_COUNTS) trait values, decide how many have each value
     elif INITIAL_COUNTS != None:
 
         if i < INITIAL_COUNTS[0]:
-            trait_value = 0
+            trait_values = [True,False]
 
         elif i <= INITIAL_COUNTS[1]:
-            trait_value = 1
+            trait_value = [False,True]
 
     else:
         
-        trait_value = random.randint(0,len(TRAITS)-1)
+        # randomly choose if has each trait
+        trait_values = [random_boolean() for t in TRAITS]
     
-    set_member_trait(CURRENT_GENERATION,CURRENT_MEMBER,trait_value)
+    set_member_traits(CURRENT_GENERATION,CURRENT_MEMBER,trait_values)
 
     CURRENT_MEMBER += 1
 
@@ -440,7 +458,8 @@ def create_blank_trait_pool():
 
     for i in range(len(TRAITS)):
 
-        BLANK_TRAIT_POOL += [0]
+        # for each trait, either has or doesn't have
+        BLANK_TRAIT_POOL += [[0,0]]
 
 
 
@@ -449,31 +468,47 @@ def create_child(parents):
     global CURRENT_MEMBER
 
     # organization:
-    # - index: trait value
-    # - value: number of parents with this trait value
-    trait_pool = BLANK_TRAIT_POOL[:]
-
-    total = 0
+    # - index: trait index
+    # - value:
+    #   - [0]: don't have trait
+    #   - [1]: have trait
+    trait_pool = copy.deepcopy(BLANK_TRAIT_POOL)
 
     for mem_ind in parents:
+        traits = get_member_raw_traits(mem_ind)
+        for i in range(len(traits)):
+            # has trait
+            if traits[i]:
+                trait_pool[i][1] += 1
+            # doesn't have trait
+            else:
+                trait_pool[i][0] += 1
 
-        trait_pool[get_member_raw_trait(mem_ind)] += 1
-        total += 1
+    new_traits = []
 
     # normalize to percentages
-    for i in range(len(trait_pool)):
+    for i in range(len(traits)):
+        total = sum(trait_pool[i])
+        probs = [p/total for p in trait_pool[i]]
 
-        trait_pool[i] = float(trait_pool[i]/total)
+        # either gets or doesn't get the trait based on the frequencies of
+        # either having or not having the trait in the parents
+        # traits do not influence the inheritance of each other
+        choice = np.random.choice([False,True], p=probs)
+        new_traits.append(choice)
 
-    indecies = np.arange(len(trait_pool))
+    print()
+    # print(parents)
+    print(get_member_raw_traits(parents[0]))
+    print(new_traits)
 
-    # indecies are trait value, trait pool values are the weights
-    child_trait = np.random.choice(indecies,p=trait_pool)
-
-    set_member_trait(CURRENT_GENERATION,CURRENT_MEMBER,child_trait)
+    set_member_traits(CURRENT_GENERATION,CURRENT_MEMBER,new_traits)
 
     for parent_ind in parents:
 
         add_child_to_member_raw(parent_ind,to_raw_index(CURRENT_GENERATION,CURRENT_MEMBER))
 
     CURRENT_MEMBER += 1
+
+def random_boolean():
+    return random.randint(0,1) == 0
