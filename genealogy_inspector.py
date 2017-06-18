@@ -204,7 +204,6 @@ def plot_d0s(parents_range,ratio_range):
         xs = []
         ys = []
 
-        counter = 0
         for ratio in ratio_range:
             xs.append(ratio)
 
@@ -224,6 +223,34 @@ def plot_d0s(parents_range,ratio_range):
         plt.plot(xs,ys,'--r',label=label)
 
     plt.xlabel('Ratio')
+    plt.ylabel('Derivative')
+
+# parents vs d0, rather than the above ratio vs d0
+def plot_d0s_parents(parents_range,ratio):
+    regressionsdata = read_testresults("exp_regressions")
+
+    xs = []
+    ys = []
+
+    for parents in parents_range:
+        xs.append(parents)
+
+        equ = regressionsdata.get_result("equations",parents,ratio)
+        ys.append(equ.d0())
+
+    plt.scatter(xs,ys,c='r')
+
+    fit = optimize.curve_fit(lambda t,a,b: a*t + b,  xs,  ys,  p0=(0.3,0))
+    
+    fit = fit[0]
+    def fit_fn(x):
+        return fit[0]*x + fit[1]
+    xs = np.arange(min(xs),max(xs),0.1)
+    ys = [fit_fn(xi) for xi in xs]
+    label = '(d0) ' + str(fit[0]) + 'x + (' + str(fit[1]) + ')'
+    plt.plot(xs,ys,'--r',label=label)
+
+    plt.xlabel('Parents')
     plt.ylabel('Derivative')
 
 class Exp_Equation:

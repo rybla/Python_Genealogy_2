@@ -9,11 +9,11 @@ def multitrait(dot,csv):
         csv_creator.create_csv(gen_data)
 
 
-a = 5
-p = 6
+a = 1
+p = 1
 t = 1
-parents = 8
-trait_weights = [1.2,1]
+parents = 2
+trait_weights = [2,1]
 
 def singletrait(dot,csv):
     genealogy.init_genealogy()
@@ -25,5 +25,5 @@ def singletrait(dot,csv):
 
 
 dot = True
-csv = True
+csv = False
 singletrait(dot,csv)
