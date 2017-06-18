@@ -9,9 +9,15 @@ def multitrait(dot,csv):
         csv_creator.create_csv(gen_data)
 
 
+a = 5
+p = 6
+t = 1
+parents = 8
+trait_weights = [1.2,1]
+
 def singletrait(dot,csv):
     genealogy.init_genealogy()
-    gen_data = genealogy.make_genealogy( name="SINGLETRAIT", generations=20, generation_sizes_function=lambda x: 10, parents=1, balanced=True, trait_factor=1, age_factor=2, trait_weights=[1,1] )
+    gen_data = genealogy.make_genealogy( name="SINGLETRAIT", generations=50, generation_sizes_function=lambda x: 50, parents=parents, balanced=True, trait_factor=t, age_factor=a, popular_factor=p, trait_weights=trait_weights )
     if dot:
         dot_creator.create_dot(gen_data)
     if csv:
