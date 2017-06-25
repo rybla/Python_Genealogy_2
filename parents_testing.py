@@ -11,12 +11,12 @@ import matplotlib.pyplot as plt
 
 tests = 1000
 generations = 2
-generations_sizes = 1000
+generations_sizes = 10
 a = 0
 p = 0
 t = 1
 
-parents_range = np.arange(1,16,2)
+parents_range = range(1,10)
 ratio = 2
 
 ratio_range = range(ratio,ratio+1)
@@ -39,4 +39,4 @@ gi.initfig()
 # gi.plot_d0s_parents(parents_range,ratio,"linear")
 gi.plot_first_slopes_parents(parents_range,ratio)
 
-gi.savefig("outputs/parents/parents_test_FS_r2_1-15.png")
+gi.savefig("outputs/parents/parents_test_FS_r2_parents1-9_gensize10.png")
