@@ -36,8 +36,6 @@ def init_genealogy():
 
     TRAITS_FUNCTION = lambda traits: sum(traits)
 
-    FITNESS_FUNCTION = lambda traits: sum(traits)
-
     """
 
     Structure of a single member (an element of MEMBERS):

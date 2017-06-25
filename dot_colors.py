@@ -12,7 +12,7 @@ def num_to_color(num):
         
     return colors[num]
 
-hex_colors = ['#FF0000', '#1E00F1', "#03B128"]
+hex_colors = ['#FF0000', '#FFFFFF', "#03B128"]
 def num_to_hex(num):
     if isinstance(num, list):
         return list_to_hex(num)
