@@ -116,6 +116,9 @@ def get_percents():
 
     return percents
 
+def initfig():
+    plt.figure(figsize=(11,8.5))
+
 def show():
     plt.show()
 
@@ -125,7 +128,13 @@ def title(s):
 def legend():
     plt.legend()
 
-def savefig(name):
+def savefig(name,rangex=None,rangey=None):
+    axes = plt.gca()
+    if rangex:
+        axes.set_xlim(rangex)
+    if rangey:
+        axes.set_ylim(rangey)
+
     plt.savefig(name)
 
 def plot_percents(parents,ratio):
@@ -226,32 +235,144 @@ def plot_d0s(parents_range,ratio_range):
     plt.ylabel('Derivative')
 
 # parents vs d0, rather than the above ratio vs d0
-def plot_d0s_parents(parents_range,ratio):
+def plot_d0s_parents(parents_range,ratio,regression_type="linear"):
     regressionsdata = read_testresults("exp_regressions")
+
+    # plot raw data
+
+    stds = []
+
+    for parents in parents_range:
+
+        # array of equations for this data point on parent number
+        equations_raw = regressionsdata.get_result("equations_raw", parents, ratio)
+
+        # array of data points for this parents number value
+        ys = []
+
+        for equ in equations_raw:
+            ys.append(equ.d0())
+
+        for y in ys:
+            plt.scatter([parents],[y],c='b',s=10,zorder=2)
+
+        stds.append(np.std(ys))
+
+    # calculate smooth data and plot error bars
 
     xs = []
     ys = []
+    i = 0
 
     for parents in parents_range:
         xs.append(parents)
 
         equ = regressionsdata.get_result("equations",parents,ratio)
-        ys.append(equ.d0())
+        d0 = equ.d0()
+        ys.append(d0)
 
-    plt.scatter(xs,ys,c='r')
+        # plot error bars
+        plt.errorbar([parents], d0, xerr=0, yerr=stds[i]/2,ecolor='r',elinewidth=10,zorder=1)
+        i += 1
 
-    fit = optimize.curve_fit(lambda t,a,b: a*t + b,  xs,  ys,  p0=(0.3,0))
-    
-    fit = fit[0]
-    def fit_fn(x):
-        return fit[0]*x + fit[1]
+    # plot smoothed data
+
+    plt.scatter(xs,ys,c='g',s=100,zorder=3)
+
+    # regression
+
+    fit = None
+    fit_fn = None
+
+    if regression_type == "linear":
+        fit = optimize.curve_fit(lambda t,a,b: a*t + b,  xs,  ys,  p0=(0.3,0))
+        fit = fit[0]
+        fit_fn = lambda x: fit[0]*x + fit[1]
+        print("y(x) = ax + b")
+        print("a =",fit[0])
+        print("b =",fit[1])
+
+    elif regression_type == "quadratic":
+        fit = optimize.curve_fit(lambda t,a,b,c: a*t**2 + b*t + c,  xs,  ys,  p0=(0.3,0,0.5))
+        fit = fit[0]
+        fit_fn = lambda x: fit[0]*x**2 + fit[1]*x + fit[2]
+        print("y(x) = ax^2 + bx + c")
+        print("a =",fit[0])
+        print("b =",fit[1])
+        print("c =",fit[2])
+
     xs = np.arange(min(xs),max(xs),0.1)
     ys = [fit_fn(xi) for xi in xs]
     label = '(d0) ' + str(fit[0]) + 'x + (' + str(fit[1]) + ')'
-    plt.plot(xs,ys,'--r',label=label)
+    plt.plot(xs,ys,'--g',label=label)
 
     plt.xlabel('Parents')
     plt.ylabel('Derivative')
+
+def plot_first_slopes_parents(parents_range,ratio,regression_type="linear"):
+    FS_data = read_testresults("first_slopes")
+
+    # plot raw data
+
+    stds = []
+
+    for parents in parents_range:
+        # array of FS for this data point on parent number
+        FS_raw = FS_data.get_result("first_slopes_raw", parents, ratio)
+        # scatter
+        for fs in FS_raw:
+            plt.scatter([parents],[fs],c='b',s=10,zorder=2)
+
+        stds.append(np.std(FS_raw))
+
+    # calculate smooth data and plot error bars
+
+    xs = []
+    ys = []
+    i = 0
+
+    for parents in parents_range:
+        xs.append(parents)
+        fs = FS_data.get_result("first_slopes",parents,ratio)
+        ys.append(fs)
+
+        # plot error bars
+        plt.errorbar([parents], fs, xerr=0, yerr=stds[i]/2,ecolor='r',elinewidth=10,zorder=1)
+        i += 1
+
+    # plot smoothed data
+
+    plt.scatter(xs,ys,c='g',s=100,zorder=3)
+
+    # regression
+
+    fit = None
+    fit_fn = None
+
+    if regression_type == "linear":
+        fit = optimize.curve_fit(lambda t,a,b: a*t + b,  xs,  ys,  p0=(0.3,0))
+        fit = fit[0]
+        fit_fn = lambda x: fit[0]*x + fit[1]
+        print("y(x) = ax + b")
+        print("a =",fit[0])
+        print("b =",fit[1])
+
+    elif regression_type == "quadratic":
+        fit = optimize.curve_fit(lambda t,a,b,c: a*t**2 + b*t + c,  xs,  ys,  p0=(0.3,0,0.5))
+        fit = fit[0]
+        fit_fn = lambda x: fit[0]*x**2 + fit[1]*x + fit[2]
+        print("y(x) = ax^2 + bx + c")
+        print("a =",fit[0])
+        print("b =",fit[1])
+        print("c =",fit[2])
+
+    xs = np.arange(min(xs),max(xs),0.1)
+    ys = [fit_fn(xi) for xi in xs]
+    label = '(fs) ' + str(fit[0]) + 'x + (' + str(fit[1]) + ')'
+    plt.plot(xs,ys,'--g',label=label)
+
+    plt.xlabel('Parents')
+    plt.ylabel('First Slope')
 
 class Exp_Equation:
     def __init__(self,a,b,c,maxx):
@@ -273,23 +394,79 @@ class Exp_Equation:
         return self.derivative(self.solve_x_at(0))
 
 def calc_exp_regressions(parents_range, ratio_range):
-    results = TestResults("exp_regressions")
+    results = read_testresults("exp_regressions")
     results.add_category("equations")
+
+    # calculate regressions for smoothed data
     for parents in parents_range:
         for ratio in ratio_range:
             # data is list of percents
             data = read_testresults("percents").get_result("percents",parents,ratio)
 
-            x = [x for x in range(0,len(data))]
-            y = [x - 1 for x in data] # want the max of the exp function to be 0
+            xs = [x for x in range(0,len(data))]
+            ys = [x - 1 for x in data] # want the max of the exp function to be 0
 
-            fit = optimize.curve_fit(lambda t,a,b,c: a*np.exp(b*t)+c,  x,  y,  p0=(-1,-0.1,0))
+            fit = optimize.curve_fit(lambda t,a,b,c: a*np.exp(b*t)+c,  xs,  ys,  p0=(-0.5,-0.1,0))
             fit = fit[0]
             fit[2] += 1 # add the 1 back in
 
             results.add_result("equations",parents,ratio,Exp_Equation(fit[0],fit[1],fit[2],len(data)))
 
+    # calculate regressions for raw data
+    for parents in parents_range:
+        for ratio in ratio_range:
+            # data is list of percents
+            data_raw = read_testresults("percents").get_result("percents_raw",parents,ratio)
+
+            equations_raw = []
+
+            for data in data_raw:
+
+                try:
+
+                    xs = [x for x in range(0,len(data))]
+                    ys = [x - 1 for x in data] # want the max of the exp function to be 0
+
+                    fit = optimize.curve_fit(lambda t,a,b,c: a*np.exp(b*t)+c,  xs,  ys,  p0=(-0.5,-0.1,0))
+                    fit = fit[0]
+                    fit[2] += 1 # add the 1 back in
+
+                    equ = Exp_Equation(fit[0],fit[1],fit[2],len(data))
+                    equations_raw.append(equ)
+
+                except:
+                    pass
+
+            results.add_result("equations_raw",parents,ratio,equations_raw)
+
     write_testresult(results)
+
+def calc_first_slopes(parents_range,ratio_range):
+    results = read_testresults("first_slopes")
+    results.add_category("first_slopes")
+
+    for parents in parents_range:
+        for ratio in ratio_range:
+            ### SMOOTHED ###
+            # calculate first slopes for smoothed data
+            data = read_testresults("percents").get_result("percents",parents,ratio)
+            # difference between first and second %s (1 generation along x axis, so divide by 1 :P )
+            FS = data[1] - data[0]
+            # add result at p,r coordinate
+            results.add_result("first_slopes",parents,ratio,FS)
+
+            ### RAW ###
+            # calculate first slopes for smoothed data (array of raw data)
+            data = read_testresults("percents").get_result("percents_raw",parents,ratio)
+            # difference between first and second %s (1 generation along x axis, so divide by 1 :P )
+            FS_raw = []
+            for d in data:
+                FS_raw.append(d[1] - d[0])
+            # add result at p,r coordinate
+            results.add_result("first_slopes_raw",parents,ratio,FS_raw)
+
+    write_testresult(results)
+            
 
 def calc_smoothed_percents(parents,ratio,tests):
     testresults = read_testresults("percents")
@@ -298,6 +475,7 @@ def calc_smoothed_percents(parents,ratio,tests):
     set_parameters({'parents': parents, 'ratio': ratio})
 
     # store all the calculated percents for each test
+    # in form : percents[generation]
     percents = []
 
     for i in tqdm(range(tests)):
@@ -306,6 +484,7 @@ def calc_smoothed_percents(parents,ratio,tests):
         percents.append(get_percents())
 
     results = [[] for x in range(len(percents[0]))]
+    results_raw = [[] for x in range(len(percents))]
 
     # i is the index of the list
     for i in range(len(percents)):
@@ -313,11 +492,18 @@ def calc_smoothed_percents(parents,ratio,tests):
         for j in range(len(percents[i])):
             results[j].append(percents[i][j])
 
+    # i is the index of the list
+    for i in range(len(percents)):
+        # j is the index of the generation
+        for j in range(len(percents[i])):
+            results_raw[i].append(percents[i][j])
+
     for i in range(len(results)):
         results[i] = np.mean(results[i])
 
     # save results to appropriate file:
     testresults.add_result("percents", parents, ratio, results)
+    testresults.add_result("percents_raw", parents, ratio, results_raw)
     write_testresult(testresults)
 
     return results

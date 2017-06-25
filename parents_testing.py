@@ -10,13 +10,13 @@ import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 
 tests = 1000
-generations = 5
-generations_sizes = 100
+generations = 2
+generations_sizes = 1000
 a = 0
 p = 0
 t = 1
 
-parents_range = np.arange(1,10,2)
+parents_range = np.arange(1,16,2)
 ratio = 2
 
 ratio_range = range(ratio,ratio+1)
@@ -31,10 +31,12 @@ gi.set_parameters({
                 })
 
 gi.calc_smoothed_percents_range(parents_range,ratio_range,tests)
-gi.calc_exp_regressions(parents_range,ratio_range)
+# gi.calc_exp_regressions(parents_range,ratio_range)
+gi.calc_first_slopes(parents_range,ratio_range)
 
-print(parents_range)
-gi.plot_d0s_parents(parents_range,ratio)
-	
+gi.initfig()
 
-gi.savefig("outputs/parents/parents_test.png")
+# gi.plot_d0s_parents(parents_range,ratio,"linear")
+gi.plot_first_slopes_parents(parents_range,ratio)
+
+gi.savefig("outputs/parents/parents_test_FS_r2_1-15.png")
