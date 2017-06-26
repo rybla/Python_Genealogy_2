@@ -4,9 +4,11 @@ import genealogy, genealogy_multitraits, csv_creator, dot_creator
 ### MULTI TRAIT ###
 ###################
 
+traits = [1,2,3]
+
 def multitrait(dot,csv):
     genealogy_multitraits.init_genealogy()
-    gen_data = genealogy_multitraits.make_genealogy( name="MULTITRAIT_TEST", generations=10, generation_sizes_function=lambda x: 10 ,parents=2, balanced=False, trait_factor=0, popular_factor=0, age_factor=0 , trait_weights=[1,1,1] )
+    gen_data = genealogy_multitraits.make_genealogy( name="MULTITRAIT_TEST", generations=20, generation_sizes_function=lambda x: 20 ,parents=2, trait_factor=1, popular_factor=1.75, age_factor=1 , traits=traits )
     if dot:
         dot_creator.create_dot(gen_data)
     if csv:

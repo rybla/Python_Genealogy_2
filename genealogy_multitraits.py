@@ -5,20 +5,13 @@ import copy
 random.seed()
 
 def init_genealogy():
-    global AGE_FACTOR, POPULAR_FACTOR, TRAIT_FACTOR, TRAITS, NAME, GENERATIONS, PARENTS, GENERATION_COUNTS, MEMBERS, BALANCED, INITIAL_COUNTS, TRAITS_FUNCTION, FITNESS_FUNCTION
+    global AGE_FACTOR, POPULAR_FACTOR, TRAIT_FACTOR, TRAITS, NAME, GENERATIONS, PARENTS, GENERATION_COUNTS, MEMBERS, TRAITS_FUNCTION, FITNESS_FUNCTION
 
     AGE_FACTOR = 0
 
     POPULAR_FACTOR = 2.00
 
     TRAIT_FACTOR = 1
-
-    # how much each trait is worth
-    # get 0 if you don't have the trait
-    TRAITS = [
-        2, # red
-        1  # blue
-    ]
 
     NAME = None
     GENERATIONS = None
@@ -30,11 +23,15 @@ def init_genealogy():
     # array of all members
     MEMBERS = []
 
-    BALANCED = False
+    def prod(arr):
+        total = 1
+        for e in arr:
+            total *= e
+        return total
 
-    INITIAL_COUNTS = None
+    FITNESS_FUNCTION = lambda factors: sum(factors)
 
-    TRAITS_FUNCTION = lambda traits: sum(traits)
+    TRAITS_FUNCTION = lambda traits: prod(traits)
 
     """
 
@@ -60,21 +57,15 @@ def make_genealogy(
             age_factor=-1,
             popular_factor=-1,
             trait_factor=-1,
-            balanced=False, # set to True if you want the first generation to be evenly colored (only works with 2 colors in traits)
-            initial_counts=None,
             dot=True,
-            trait_weights=None
+            traits=None
         ):
 
-    global NAME, GENERATIONS, PARENTS, GENERATION_SIZES_FUNCTION, BALANCED, AGE_FACTOR, POPULAR_FACTOR, TRAIT_FACTOR, TRAITS, INITIAL_COUNTS
+    global NAME, GENERATIONS, PARENTS, GENERATION_SIZES_FUNCTION, AGE_FACTOR, POPULAR_FACTOR, TRAIT_FACTOR, TRAITS
 
     GENERATIONS = generations
     PARENTS = parents
     GENERATION_SIZES_FUNCTION = generation_sizes_function
-
-    BALANCED = balanced
-
-    INITIAL_COUNTS = initial_counts
 
     # set all the factors if they were given as inputs
 
@@ -90,9 +81,9 @@ def make_genealogy(
 
         TRAIT_FACTOR = trait_factor
 
-    if trait_weights != None:
+    if traits != None:
 
-        TRAITS = trait_weights
+        TRAITS = traits
 
     # set the name of genealogy (and file)
 
@@ -194,13 +185,21 @@ def get_member_raw_traits(mem_ind):
     return get_member_raw(mem_ind)[1]
 
 
-def get_memeber_trait_strength(gen_num,mem_num):
 
-    return TRAITS_FUNCTION(get_member_traits(gen_num,mem_num))
+def get_memeber_trait_strength(gen_num,mem_num):
+    trait_values = get_member_traits(gen_num,mem_num)
+    trait_strengths = []
+    for i in range(len(trait_values)):
+        if trait_values[i]:
+            trait_strengths.append(TRAITS[i]) # ratio value (from TRAITS)
+        else:
+            trait_strengths.append(1) # base value
+
+    return TRAITS_FUNCTION(trait_strengths)
+
 
 
 def get_member_raw_trait_strength(mem_ind):
-
     n = to_normal_index(mem_ind)
     return get_memeber_trait_strength(n[0],n[1])
 
@@ -380,32 +379,9 @@ def update_fitness_raw(mem_ind):
 # balance_first_gen only works if there are only two traits
 def create_random_member(i):
     global CURRENT_MEMBER
-
-    # make half of the first generation each of the two possible traits
-    # (only works with two traits!)
-    if BALANCED:
-
-        half = int(get_gen_size(0)/2)
-
-        if i < half:
-            trait_values = [True,False]
-
-        else:
-            trait_values = [False,True]
-
-    # for len(INITIAL_COUNTS) trait values, decide how many have each value
-    elif INITIAL_COUNTS != None:
-
-        if i < INITIAL_COUNTS[0]:
-            trait_values = [True,False]
-
-        elif i <= INITIAL_COUNTS[1]:
-            trait_value = [False,True]
-
-    else:
         
-        # randomly choose if has each trait
-        trait_values = [random_boolean() for t in TRAITS]
+    # randomly choose if has each trait
+    trait_values = [random_boolean() for t in TRAITS]
     
     set_member_traits(CURRENT_GENERATION,CURRENT_MEMBER,trait_values)
 
@@ -495,10 +471,6 @@ def create_child(parents):
         choice = np.random.choice([False,True], p=probs)
         new_traits.append(choice)
 
-    print()
-    # print(parents)
-    print(get_member_raw_traits(parents[0]))
-    print(new_traits)
 
     set_member_traits(CURRENT_GENERATION,CURRENT_MEMBER,new_traits)
 

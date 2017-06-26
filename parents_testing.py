@@ -30,13 +30,13 @@ gi.set_parameters({
                     'balanced': True
                 })
 
-gi.calc_smoothed_percents_range(parents_range,ratio_range,tests)
-# gi.calc_exp_regressions(parents_range,ratio_range)
-gi.calc_first_slopes(parents_range,ratio_range)
+# gi.calc_smoothed_percents_range(parents_range,ratio_range,tests)
+# # gi.calc_exp_regressions(parents_range,ratio_range)
+# gi.calc_first_slopes(parents_range,ratio_range)
 
 gi.initfig()
 
 # gi.plot_d0s_parents(parents_range,ratio,"linear")
-gi.plot_first_slopes_parents(parents_range,ratio)
+gi.plot_first_slopes_parents(parents_range,ratio,"quadratic")
 
-gi.savefig("outputs/parents/parents_test_FS_r2_parents1-9_gensize10.png")
+gi.savefig("outputs/parents/parents_test_FS_r2_parents1-9_gensize10_quadratic.png")

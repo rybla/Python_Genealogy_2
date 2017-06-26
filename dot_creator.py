@@ -192,7 +192,8 @@ def create_member_attributes():
             s += " shape=" + str(shape)
             s += " width=" + str(width)
             s += " fontsize=" + str(fontsize)
-            s += " label=\"" + str(fitness) + "\""
+            # s += " label=\"" + str(fitness) + "\""
+            s += " label=\"\""
             s += "];"
             dot_file.write(s)
 
