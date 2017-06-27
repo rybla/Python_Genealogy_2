@@ -5,13 +5,13 @@ import genealogy, genealogy_multitraits, csv_creator, dot_creator
 ###################
 
 generations = 100
-generation_sizes = 100
+generation_sizes = 50
 
 a = 0.5
 p = 0.5
-t = 0.7
+t = 1
 parents = 2
-traits = [1,2,3]
+traits = [1.1,1.2,1.3]
 
 def multitrait(dot,csv):
     genealogy_multitraits.init_genealogy()
