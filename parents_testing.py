@@ -9,14 +9,14 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 
-tests = 1000
+tests = 500
 generations = 2
-generations_sizes = 10
+generations_sizes = 100
 a = 0
 p = 0
 t = 1
 
-parents_range = range(1,10)
+parents_range = [1,25,50,90]
 ratio = 2
 
 ratio_range = range(ratio,ratio+1)
@@ -30,13 +30,13 @@ gi.set_parameters({
                     'balanced': True
                 })
 
-# gi.calc_smoothed_percents_range(parents_range,ratio_range,tests)
+gi.calc_smoothed_percents_range(parents_range,ratio_range,tests)
 # # gi.calc_exp_regressions(parents_range,ratio_range)
-# gi.calc_first_slopes(parents_range,ratio_range)
+gi.calc_first_slopes(parents_range,ratio_range)
 
 gi.initfig()
 
 # gi.plot_d0s_parents(parents_range,ratio,"linear")
 gi.plot_first_slopes_parents(parents_range,ratio,"quadratic")
 
-gi.savefig("outputs/parents/parents_test_FS_r2_parents1-9_gensize10_quadratic.png")
+gi.savefig("outputs/parents/parents_test_FS_r2_parents1-90_gensize100_quadratic.png")
