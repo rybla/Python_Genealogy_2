@@ -463,7 +463,7 @@ def create_child(parents):
     # normalize to percentages
     for i in range(len(traits)):
         total = sum(trait_pool[i])
-        probs = [p/total for p in trait_pool[i]]
+        probs = [ p/total for p in trait_pool[i] ]
 
         # either gets or doesn't get the trait based on the frequencies of
         # either having or not having the trait in the parents
