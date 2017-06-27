@@ -9,7 +9,7 @@ generation_sizes = 10
 
 a = 1.5
 p = 1.1
-t = 2
+t = 0.6
 parents = 2
 traits = [1.2,1.4,1.6]
 
