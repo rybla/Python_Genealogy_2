@@ -1,5 +1,5 @@
-import genealogy
 import matplotlib.pyplot as plt
+import genealogy_multitraits as genealogy
 import numpy as np
 import pickle
 import os
@@ -10,16 +10,17 @@ from testresults import TestResults
 
 
 parents = 1
-ratio = 1
 tests = 4
-power = 1
-balanced = False
-initial_counts = [1,19]
 generations = 50
 generations_sizes = 20
 a = 1
 p = 1
 t = 1
+traits = [2,3,4]
+target = [1,1,1]
+traits_function = 'prod'
+
+ratio = 0 # doesnt matter for multitrait genealogies
 
 testresultsfile = "outputs/testresults/"
 
@@ -35,15 +36,11 @@ def write_testresult(results):
         pickle.dump(results, datafile, pickle.HIGHEST_PROTOCOL)  
 
 def set_parameters(params):
-    global tests, ratio, parents, power, generations, generations_sizes, a, p, t, initial_counts, balanced
+    global tests, parents, generations, generations_sizes, a, p, t, traits, target, traits_function
     if 'tests' in params:
         tests = params['tests']
-    if 'ratio' in params:
-        ratio = params['ratio']
     if 'parents' in params:
         parents = params['parents']
-    if 'power' in params:
-        power = params['power']
     if 'generations' in params:
         generations = params['generations']
     if 'generations_sizes' in params:
@@ -54,20 +51,12 @@ def set_parameters(params):
         p = params['p']
     if 't' in params:
         t = params['t']
-    if 'initial_counts' in params:
-        initial_counts = params['initial_counts']
-    if 'balanced' in params:
-        balanced = params['balanced']
-
-def reset_parameters():
-    global tests, power, generations, generations_sizes, a, p, t
-    tests = 4
-    power = 1
-    generations = 50
-    generations_sizes = 16
-    a = 1
-    p = 1
-    t = 1
+    if 'traits' in params:
+        traits = params['traits']
+    if 'target' in params:
+        target = params['target']
+    if 'traits_function' in params:
+        traits_function = params['traits_function']
 
 def generation_sizes_function(gen_ind):
     return generations_sizes
@@ -80,35 +69,28 @@ def make_inspector_genealogy():
             generations=generations,
             parents=parents,
             generation_sizes_function=generation_sizes_function,
-            balanced=balanced,
-            initial_counts=initial_counts,
             age_factor=a,
             popular_factor=p,
             trait_factor=t,
-            trait_weights=[ratio,1]
+            traits=traits,
+            traits_function=traits_function
         )
 
 def get_percents():
-    # counts (for each trait)
-    counts = [0 for t in genealogy.TRAITS]
-
     # percents (for each generation)
     percents = []
 
     # calculate percents
     i = 0
     for j in genealogy.GENERATION_COUNTS:
-
-        counts = [0 for count in counts]
-
+        
+        # see how many members have the target trait
+        count = 0
         for k in range(j):
-
-            counts[genealogy.get_member_raw_trait(i)] += 1
-
+            count += int(genealogy.get_member_raw_traits(i) == target)
             i += 1
 
-        # calculate the percentage of generation that is 0
-        percents.append( counts[0] / sum(counts) )
+        percents.append( count / j )
 
     return percents
 
@@ -133,22 +115,20 @@ def savefig(name,rangex=None,rangey=None):
 
     plt.savefig(name)
 
-def plot_percents(parents,ratio):
-
+def plot_percents(parents):
     results = read_testresults("percents").get_result("percents",parents,ratio)
 
     plt.title("Percentage of population that is dominant trait")#\n(parents=" + str(parents) + ",ratio=" + str(ratio) + ")")
     plt.xlabel('Generation')
-    plt.ylabel('Percentage Red')
+    plt.ylabel('Percentage Gray')
 
     xs = [x for x in range(len(results))]
 
-    plt.plot(xs, results, '.', label='ratio=' + str(ratio))
+    plt.plot(xs, results, '.', label='parents=' + str(parents))
 
-def plot_percents_range(parents_range,ratio_range):
+def plot_percents_range(parents_range):
     for parents in parents_range:
-        for ratio in ratio_range:
-            plot_percents(parents,ratio)
+        plot_percents(parents)
 
 def plot_exp_regressions(parents_range, ratio_range, x50=False):
     regressionsdata = read_testresults("exp_regressions")
@@ -175,135 +155,6 @@ def plot_exp_regressions(parents_range, ratio_range, x50=False):
 
             counter += 1
 
-def plot_d50s(parents,ratio_range):
-    regressionsdata = read_testresults("exp_regressions")
-
-    xs = []
-    ys = []
-
-    counter = 0
-    for ratio in ratio_range:
-        xs.append(ratio)
-
-        equ = regressionsdata.get_result("equations",parents,ratio)
-        ys.append(equ.d50())
-
-    plt.scatter(xs,ys)
-
-    fit = optimize.curve_fit(lambda t,a,b: a*t + b,  xs,  ys,  p0=(0.3,0))
-    fit = fit[0]
-    def fit_fn(x):
-        return fit[0]*x + fit[1]
-    xs = np.arange(min(xs),max(xs),0.1)
-    ys = [fit_fn(xi) for xi in xs]
-    label = '(d50) ' + str(fit[0]) + 'x + (' + str(fit[1]) + ')'
-    plt.plot(xs,ys,'--b',label=label)
-
-    plt.xlabel('Ratio')
-    plt.ylabel('Derivative')
-
-def plot_d0s(parents_range,ratio_range):
-    regressionsdata = read_testresults("exp_regressions")
-
-    for parents in parents_range:
-        xs = []
-        ys = []
-
-        for ratio in ratio_range:
-            xs.append(ratio)
-
-            equ = regressionsdata.get_result("equations",parents,ratio)
-            ys.append(equ.d0())
-
-        plt.scatter(xs,ys,c='r')
-
-        fit = optimize.curve_fit(lambda t,a,b: a*t + b,  xs,  ys,  p0=(0.3,0))
-        
-        fit = fit[0]
-        def fit_fn(x):
-            return fit[0]*x + fit[1]
-        xs = np.arange(min(xs),max(xs),0.1)
-        ys = [fit_fn(xi) for xi in xs]
-        label = '(d0) ' + str(fit[0]) + 'x + (' + str(fit[1]) + ')'
-        plt.plot(xs,ys,'--r',label=label)
-
-    plt.xlabel('Ratio')
-    plt.ylabel('Derivative')
-
-# parents vs d0, rather than the above ratio vs d0
-def plot_d0s_parents(parents_range,ratio,regression_type="linear"):
-    regressionsdata = read_testresults("exp_regressions")
-
-    # plot raw data
-
-    stds = []
-
-    for parents in parents_range:
-
-        # array of equations for this data point on parent number
-        equations_raw = regressionsdata.get_result("equations_raw", parents, ratio)
-
-        # array of data points for this parents number value
-        ys = []
-
-        for equ in equations_raw:
-            ys.append(equ.d0())
-
-        for y in ys:
-            plt.scatter([parents],[y],c='b',s=10,zorder=2)
-
-        stds.append(np.std(ys))
-
-    # calculate smooth data and plot error bars
-
-    xs = []
-    ys = []
-    i = 0
-
-    for parents in parents_range:
-        xs.append(parents)
-
-        equ = regressionsdata.get_result("equations",parents,ratio)
-        d0 = equ.d0()
-        ys.append(d0)
-
-        # plot error bars
-        plt.errorbar([parents], d0, xerr=0, yerr=stds[i]/2,ecolor='r',elinewidth=10,zorder=1)
-        i += 1
-
-    # plot smoothed data
-
-    plt.scatter(xs,ys,c='g',s=100,zorder=3)
-
-    # regression
-
-    fit = None
-    fit_fn = None
-
-    if regression_type == "linear":
-        fit = optimize.curve_fit(lambda t,a,b: a*t + b,  xs,  ys,  p0=(0.3,0))
-        fit = fit[0]
-        fit_fn = lambda x: fit[0]*x + fit[1]
-        print("y(x) = ax + b")
-        print("a =",fit[0])
-        print("b =",fit[1])
-
-    elif regression_type == "quadratic":
-        fit = optimize.curve_fit(lambda t,a,b,c: a*t**2 + b*t + c,  xs,  ys,  p0=(0.3,0,0.5))
-        fit = fit[0]
-        fit_fn = lambda x: fit[0]*x**2 + fit[1]*x + fit[2]
-        print("y(x) = ax^2 + bx + c")
-        print("a =",fit[0])
-        print("b =",fit[1])
-        print("c =",fit[2])
-
-    xs = np.arange(min(xs),max(xs),0.1)
-    ys = [fit_fn(xi) for xi in xs]
-    label = '(d0) ' + str(fit[0]) + 'x + (' + str(fit[1]) + ')'
-    plt.plot(xs,ys,'--g',label=label)
-
-    plt.xlabel('Parents')
-    plt.ylabel('Derivative')
 
 def plot_first_slopes_parents(parents_range,ratio,regression_type="linear"):
     FS_data = read_testresults("first_slopes")
@@ -464,11 +315,11 @@ def calc_first_slopes(parents_range,ratio_range):
     write_testresult(results)
             
 
-def calc_smoothed_percents(parents,ratio,tests):
+def calc_smoothed_percents(parents):
     testresults = read_testresults("percents")
 
     # graph percents vs generation num
-    set_parameters({'parents': parents, 'ratio': ratio})
+    set_parameters({'parents': parents})
 
     # store all the calculated percents for each test
     # in form : percents[generation]
@@ -476,7 +327,6 @@ def calc_smoothed_percents(parents,ratio,tests):
 
     for i in tqdm(range(tests)):
         make_inspector_genealogy()
-
         percents.append(get_percents())
 
     results = [[] for x in range(len(percents[0]))]
@@ -504,7 +354,6 @@ def calc_smoothed_percents(parents,ratio,tests):
 
     return results
 
-def calc_smoothed_percents_range(parents_range,ratio_range,tests):
+def calc_smoothed_percents_range(parents_range):
     for parents in parents_range:
-        for ratio in ratio_range:
-            calc_smoothed_percents(parents,ratio,tests)
+        calc_smoothed_percents(parents)

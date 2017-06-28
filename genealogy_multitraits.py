@@ -4,6 +4,12 @@ import math
 import copy
 random.seed()
 
+def prod(arr):
+    total = 1
+    for e in arr:
+        total *= e
+    return total
+
 def init_genealogy():
     global AGE_FACTOR, POPULAR_FACTOR, TRAIT_FACTOR, TRAITS, NAME, GENERATIONS, PARENTS, GENERATION_COUNTS, MEMBERS, TRAITS_FUNCTION, FITNESS_FUNCTION
 
@@ -23,15 +29,9 @@ def init_genealogy():
     # array of all members
     MEMBERS = []
 
-    def prod(arr):
-        total = 1
-        for e in arr:
-            total *= e
-        return total
+    FITNESS_FUNCTION = sum
 
-    FITNESS_FUNCTION = lambda factors: sum(factors)
-
-    TRAITS_FUNCTION = lambda traits: prod(traits)
+    TRAITS_FUNCTION = prod
 
     """
 
@@ -57,8 +57,8 @@ def make_genealogy(
             age_factor=-1,
             popular_factor=-1,
             trait_factor=-1,
-            dot=True,
-            traits=None
+            traits=None,
+            traits_function='prod'
         ):
 
     global NAME, GENERATIONS, PARENTS, GENERATION_SIZES_FUNCTION, AGE_FACTOR, POPULAR_FACTOR, TRAIT_FACTOR, TRAITS
@@ -84,6 +84,11 @@ def make_genealogy(
     if traits != None:
 
         TRAITS = traits
+
+    if traits_function == 'prod':
+        TRAITS_FUNCTION = prod
+    elif traits_function == 'sum':
+        TRAITS_FUNCTION = sum
 
     # set the name of genealogy (and file)
 
@@ -315,9 +320,38 @@ def fill_generation(gen_num):
     # is the first generation (no parents)
     if gen_num == 0:
 
-        for mem_num in range(get_gen_size(gen_num)):
+        # make the 2**len(TRAITS) different possible members
+        # however many times possible (sets of 2**len(TRAITS))
+        # then the rest will be random
 
-            create_random_member(mem_num)
+        gen_size = get_gen_size(gen_num)
+        combos_count = 2**len(TRAITS) # length of a set of combos
+        randoms_count = gen_size % combos_count # left over after sets of combos
+
+        sets_count = gen_size // combos_count # how many sets of combos there will be
+
+        # needs to have length len(TRAITS)
+        def decToBinAr(x):
+            b = bin(x)[2:]
+            ls = [int(c)==1 for c in b]
+            ls.reverse()
+            while len(ls) < len(TRAITS):
+                ls.append(False)
+            return ls
+
+        # balance out the distribution
+        for i in range(sets_count): # for each set
+            for j in range(combos_count): # create a member for each combo
+                trait_values = decToBinAr(j)
+                set_member_traits(CURRENT_GENERATION,CURRENT_MEMBER,trait_values)
+                CURRENT_MEMBER += 1
+
+        # for the remainders, just make them random
+        for i in range(randoms_count):
+            # randomly choose if has each trait
+            trait_values = [random_boolean() for t in TRAITS]
+            set_member_traits(CURRENT_GENERATION,CURRENT_MEMBER,trait_values)
+            CURRENT_MEMBER += 1
 
     else:
 

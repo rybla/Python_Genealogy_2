@@ -4,7 +4,7 @@ import genealogy, genealogy_multitraits, csv_creator, dot_creator
 ### MULTI TRAIT ###
 ###################
 
-generations = 50
+generations = 10
 generation_sizes = 10
 
 a = 1.8
@@ -15,13 +15,13 @@ traits = [1.2,1.4,1.6]
 
 def multitrait(dot,csv):
     genealogy_multitraits.init_genealogy()
-    gen_data = genealogy_multitraits.make_genealogy( name="MULTITRAIT_prod_6", generations=generations, generation_sizes_function=lambda x: generation_sizes ,parents=parents, trait_factor=t, popular_factor=p, age_factor=a, traits=traits)
+    gen_data = genealogy_multitraits.make_genealogy( name="MULTITRAIT_balancetest", generations=generations, generation_sizes_function=lambda x: generation_sizes ,parents=parents, trait_factor=t, popular_factor=p, age_factor=a, traits=traits)
     if dot:
         dot_creator.create_dot(gen_data,True)
     if csv:
         csv_creator.create_csv(gen_data)
 
-multitrait(True,True)
+multitrait(True,False)
 
 
 ####################
