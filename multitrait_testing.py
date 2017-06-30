@@ -9,6 +9,8 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 
+# tests, parents, generations, generations_sizes, a, p, t, traits
+
 parents_range = [1,10,50]
 
 gi.set_parameters({
@@ -23,14 +25,14 @@ gi.set_parameters({
 	'traits_function': 'sum'
 })
 
-# gi.calc_smoothed_percents_range(parents_range)
-# gi.plot_percents_range(parents_range)
-# gi.savefig("outputs/parents/multitrait/MultitraitPercents_magnified_Sum.png")
-
-gi.set_parameters({
-	'traits_function': 'prod'
-})
-
 gi.calc_smoothed_percents_range(parents_range)
 gi.plot_percents_range(parents_range)
-gi.savefig("outputs/parents/multitrait/MultitraitPercents_Prod.png")
+gi.savefig("outputs/parents/multitrait/MultitraitPercents_magnified_Sum.png")
+
+# gi.set_parameters({
+# 	'traits_function': 'prod'
+# })
+
+# gi.calc_smoothed_percents_range(parents_range)
+# gi.plot_percents_range(parents_range)
+# gi.savefig("outputs/parents/multitrait/MultitraitPercents_Prod.png")
