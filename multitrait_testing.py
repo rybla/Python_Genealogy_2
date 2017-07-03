@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 # tests, parents, generations, generations_sizes, a, p, t, traits
 
-parents_range = [1,10,50]
+parents_range = [1,2,3]
 
 gi.set_parameters({
 	'tests': 100,
@@ -20,14 +20,14 @@ gi.set_parameters({
 	'a': 1,
 	'p': 1,
 	't': 1,
-	'traits': [2,8,32],
+	'traits': [2,3,3],
 	'target': [1,1,1],
-	'traits_function': 'sum'
+	'traits_function': 'prod'
 })
 
 gi.calc_smoothed_percents_range(parents_range)
 gi.plot_percents_range(parents_range)
-gi.savefig("outputs/parents/multitrait/MultitraitPercents_magnified_Sum.png")
+gi.savefig("outputs/parents/multitrait/MultitraitPercents_magnified+_prod.png")
 
 # gi.set_parameters({
 # 	'traits_function': 'prod'
