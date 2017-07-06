@@ -156,7 +156,7 @@ def plot_exp_regressions(parents_range, ratio_range, x50=False):
             counter += 1
 
 
-def plot_first_slopes_parents(parents_range,ratio,regression_type="linear"):
+def plot_first_slopes_parents(parents_range,regression_type="linear"):
     FS_data = read_testresults("first_slopes")
 
     # plot raw data
@@ -184,7 +184,7 @@ def plot_first_slopes_parents(parents_range,ratio,regression_type="linear"):
         ys.append(fs)
 
         # plot error bars
-        plt.errorbar([parents], fs, xerr=0, yerr=stds[i]/2,ecolor='r',elinewidth=10,zorder=1)
+        plt.errorbar([parents], fs, xerr=0, yerr=stds[i],ecolor='r',elinewidth=10,zorder=1)
         i += 1
 
     # plot smoothed data
@@ -288,29 +288,28 @@ def calc_exp_regressions(parents_range, ratio_range):
 
     write_testresult(results)
 
-def calc_first_slopes(parents_range,ratio_range):
+def calc_first_slopes(parents_range):
     results = read_testresults("first_slopes")
     results.add_category("first_slopes")
 
     for parents in parents_range:
-        for ratio in ratio_range:
-            ### SMOOTHED ###
-            # calculate first slopes for smoothed data
-            data = read_testresults("percents").get_result("percents",parents,ratio)
-            # difference between first and second %s (1 generation along x axis, so divide by 1 :P )
-            FS = data[1] - data[0]
-            # add result at p,r coordinate
-            results.add_result("first_slopes",parents,ratio,FS)
+        ### SMOOTHED ###
+        # calculate first slopes for smoothed data
+        data = read_testresults("percents").get_result("percents",parents,ratio)
+        # difference between first and second %s (1 generation along x axis, so divide by 1 :P )
+        FS = data[1] - data[0]
+        # add result at p,r coordinate
+        results.add_result("first_slopes",parents,ratio,FS)
 
-            ### RAW ###
-            # calculate first slopes for smoothed data (array of raw data)
-            data = read_testresults("percents").get_result("percents_raw",parents,ratio)
-            # difference between first and second %s (1 generation along x axis, so divide by 1 :P )
-            FS_raw = []
-            for d in data:
-                FS_raw.append(d[1] - d[0])
-            # add result at p,r coordinate
-            results.add_result("first_slopes_raw",parents,ratio,FS_raw)
+        ### RAW ###
+        # calculate first slopes for smoothed data (array of raw data)
+        data = read_testresults("percents").get_result("percents_raw",parents,ratio)
+        # difference between first and second %s (1 generation along x axis, so divide by 1 :P )
+        FS_raw = []
+        for d in data:
+            FS_raw.append(d[1] - d[0])
+        # add result at p,r coordinate
+        results.add_result("first_slopes_raw",parents,ratio,FS_raw)
 
     write_testresult(results)
             

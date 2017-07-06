@@ -11,28 +11,25 @@ import matplotlib.pyplot as plt
 
 # tests, parents, generations, generations_sizes, a, p, t, traits
 
-parents_range = [1,2,3]
+parents_range = [1,10,50,90]
 
 gi.set_parameters({
-	'tests': 100,
-	'generations': 10,
+	'tests': 500,
+	'generatiaons': 2,
 	'generations_sizes': 100,
-	'a': 1,
-	'p': 1,
+	'a': 0,
+	'p': 0,
 	't': 1,
-	'traits': [2,3,3],
+	'traits': [2,3,4],
 	'target': [1,1,1],
-	'traits_function': 'prod'
+	'traits_function': 'sum'
 })
 
 gi.calc_smoothed_percents_range(parents_range)
-gi.plot_percents_range(parents_range)
-gi.savefig("outputs/parents/multitrait/MultitraitPercents_magnified+_prod.png")
+gi.calc_first_slopes(parents_range)
 
-# gi.set_parameters({
-# 	'traits_function': 'prod'
-# })
+gi.initfig()
 
-# gi.calc_smoothed_percents_range(parents_range)
-# gi.plot_percents_range(parents_range)
-# gi.savefig("outputs/parents/multitrait/MultitraitPercents_Prod.png")
+gi.plot_first_slopes_parents(parents_range,"quadratic")
+
+gi.savefig("outputs/parents/multitrait/evolutionrate_parents_sum.png")
