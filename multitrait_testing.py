@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 parents_range = [1,10,50,90]
 
 gi.set_parameters({
-	'tests': 500,
+	'tests': 100,
 	'generatiaons': 2,
 	'generations_sizes': 100,
 	'a': 0,
