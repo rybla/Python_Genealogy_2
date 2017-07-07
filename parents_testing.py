@@ -16,7 +16,7 @@ a = 0
 p = 0
 t = 1
 
-parents_range = [1,25,50,90]
+parents_range = [1,10,50,90]
 ratio = 2
 
 ratio_range = range(ratio,ratio+1)
@@ -39,4 +39,4 @@ gi.initfig()
 # gi.plot_d0s_parents(parents_range,ratio,"linear")
 gi.plot_first_slopes_parents(parents_range,ratio,"quadratic")
 
-gi.savefig("outputs/parents/parents_test_FS_r2_parents1-90_gensize100_quadratic.png")
+gi.savefig("outputs/parents/evolutionrate_parents_singletrait.png")
