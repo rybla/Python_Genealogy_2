@@ -11,12 +11,12 @@ import matplotlib.pyplot as plt
 
 # tests, parents, generations, generations_sizes, a, p, t, traits
 
-parents_range = [1,10,50,90]
+parents_range = [1,2,3,4,5,6,7,8,9]
 
 gi.set_parameters({
-	'tests': 100,
+	'tests': 500,
 	'generatiaons': 2,
-	'generations_sizes': 100,
+	'generations_sizes': 10,
 	'a': 0,
 	'p': 0,
 	't': 1,
@@ -32,4 +32,4 @@ gi.initfig()
 
 gi.plot_first_slopes_parents(parents_range,"quadratic")
 
-gi.savefig("outputs/parents/multitrait/evolutionrate_parents_sum.png")
+gi.savefig("outputs/parents/multitrait/evolutionrate_parents_sum_full.png")
