@@ -11,12 +11,12 @@ import matplotlib.pyplot as plt
 
 tests = 500
 generations = 2
-generations_sizes = 100
+generations_sizes = 10
 a = 0
 p = 0
 t = 1
 
-parents_range = [1,10,50,90]
+parents_range = [1,2,3,4,5,6,7,8,9]
 ratio = 2
 
 ratio_range = range(ratio,ratio+1)
@@ -39,4 +39,4 @@ gi.initfig()
 # gi.plot_d0s_parents(parents_range,ratio,"linear")
 gi.plot_first_slopes_parents(parents_range,ratio,"quadratic")
 
-gi.savefig("outputs/parents/evolutionrate_parents_singletrait.png")
+gi.savefig("outputs/parents/evolutionrate/evolutionrate_parents_singletrait.png")
