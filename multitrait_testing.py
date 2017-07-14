@@ -20,7 +20,7 @@ gi.set_parameters({
 	'a': 0,
 	'p': 0,
 	't': 1,
-	'traits': [2,3,4],
+	'traits': [2,8,32],
 	'target': [1,1,1],
 	'traits_function': 'sum'
 })
@@ -32,4 +32,4 @@ gi.initfig()
 
 gi.plot_first_slopes_parents(parents_range,"quadratic")
 
-gi.savefig("outputs/parents/multitrait/evolutionrate_parents_sum_full.png")
+gi.savefig("outputs/parents/multitrait/evolutionrate_parents_sum_full_ratios+.png")
