@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 # tests, parents, generations, generations_sizes, a, p, t, traits
 
-parents_range = [1,2,3,4,5,6,7,8,9]
+parents_range = [1,4,6,8,10]
 
 gi.set_parameters({
 	'tests': 500,
@@ -22,7 +22,7 @@ gi.set_parameters({
 	't': 1,
 	'traits': [2,8,32],
 	'target': [1,1,1],
-	'traits_function': 'sum'
+	'traits_function': 'prod' # prod or sum
 })
 
 gi.calc_smoothed_percents_range(parents_range)
@@ -32,4 +32,4 @@ gi.initfig()
 
 gi.plot_first_slopes_parents(parents_range,"quadratic")
 
-gi.savefig("outputs/parents/multitrait/evolutionrate_parents_sum_full_ratios+.png")
+gi.savefig("outputs/parents/evolutionrate/evolutionrate_parents_prod_full_ratios+.png")
