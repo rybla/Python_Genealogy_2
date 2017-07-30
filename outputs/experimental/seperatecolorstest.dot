@@ -1,0 +1,30 @@
+graph "MULTITRAIT_example1"{
+   graph [nodesep=0.1];
+   graph [ranksep=1];
+   graph [size=5];
+   graph [ratio=fill];
+   node [style=filled];
+   node [fontcolor=white];
+   node [fixedsize=true];
+   subgraph colors_labels {
+      node[style=invis];edge[style=invis]
+      Red -- Black;
+   }
+   {rank=same;Red;"0:1";}
+   {rank=same;Black;"0:0";"1:0";"1:1";"2:0";"2:1";}
+
+    "0:0" [color="#000000" shape=circle width=1 fontsize=20.0 label=""];
+    "0:1" [color="#FF0000" shape=circle width=1 fontsize=20.0 label=""];
+    "1:0" [color="#000000" shape=circle width=1 fontsize=20.0 label=""];
+    "1:1" [color="#000000" shape=circle width=1 fontsize=20.0 label=""];
+    "2:0" [color="#000000" shape=circle width=1 fontsize=20.0 label=""];
+    "2:1" [color="#000000" shape=circle width=1 fontsize=20.0 label=""];
+   "0:0" -- "1:0" [color="#000000" penwidth=4];
+   "0:0" -- "1:1" [color="#000000" penwidth=4];
+   "0:0" -- "2:1" [color="#000000" penwidth=4];
+   "0:1" -- "1:0" [color="#FF0000" penwidth=4];
+   "0:1" -- "1:1" [color="#FF0000" penwidth=4];
+   "0:1" -- "2:0" [color="#FF0000" penwidth=4];
+   "1:0" -- "2:0" [color="#000000" penwidth=4];
+   "1:0" -- "2:1" [color="#000000" penwidth=4];
+}

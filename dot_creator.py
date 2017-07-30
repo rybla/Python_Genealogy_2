@@ -7,9 +7,9 @@ import math
 genealogy_data = None
 
 dot_file = None
-generations_labels = []
+labels = []
 
-def create_dot(gen_data,pdf=False):
+def create_dot(gen_data,pdf=False,seperate_colors=False,trait=0):
     global genealogy_data, dot_file
 
     genealogy_data = gen_data
@@ -22,8 +22,15 @@ def create_dot(gen_data,pdf=False):
 
     # create the dot stuff
     config_graph()
-    create_generations_labels()
-    create_generations()
+
+    # seperate or not
+    if seperate_colors:
+        create_colors_labels(traits)
+        create_colors(traits)
+    else:
+        create_labels()
+        create_generations()
+    
     create_member_attributes()
     create_relations()
 
@@ -97,18 +104,18 @@ def set_edge_attribute(attr,val):
 
 
 
-def create_generations_labels():
-    global generations_labels
+def create_labels():
+    global labels
 
-    dot_file.write("   subgraph generations_labels {")
-    dot_file.write("       node[color=grey style=filled fontsize=12 shape=cds fontcolor=black fixedsize=false style=invis];edge[style=invis]")
+    dot_file.write("   subgraph labels {")
+    dot_file.write("       node[style=invis];edge[style=invis]")
     
     s = ""
     
     # for each generation
     for i in range(len(get_generation_sizes())):
         lab = "Gen" + str(i)
-        generations_labels.append(lab)
+        labels.append(lab)
         s += lab + " -- "
     s = s[:-4]
     
@@ -120,11 +127,55 @@ def create_generations_labels():
 def create_generations():
     for j in range(len(get_generation_sizes())):
 
-        s = "   {rank=same;" + generations_labels[j] + ";"
+        s = "   {rank=same;" + labels[j] + ";"
         
         for i in range(get_generation_size(j)):
         
             s += index_to_name(j,i) + ";"
+        
+        s += "}"
+        
+        dot_file.write(s)
+
+
+
+def create_colors_labels(traits):
+    global labels
+
+    dot_file.write("   subgraph labels {")
+    dot_file.write("       node[style=invis];edge[style=invis]")
+
+    s = ""
+    
+    # for each color
+    for i in range(2**traits): # number of trait combinations
+        lab = "Color" + dot_colors.to_bin(i)
+        labels.append(lab)
+        s += lab + " -- "
+    s = s[:-4]
+    
+    dot_file.write("      " + s + ";")
+    dot_file.write("   }")
+
+
+
+def create_colors(traits):
+    for c in range(2**traits):
+        s = "   {rank=same;" + labels[j] + ";"
+        color = dot_colors.to_hex()
+
+        gen_ind = 0
+        for gen in get_generation_sizes():
+            for i in range(gen):
+                m = get_member(gen_ind,i)
+                if calculate_member_color(m) == "#" + str()
+            gen_ind += 1
+
+        s = "   {rank=same;" + labels[j] + ";"
+        
+        for i in range(get_generation_size(j)):
+        
+            
         
         s += "}"
         
